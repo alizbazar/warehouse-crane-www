@@ -1,10 +1,10 @@
 Gear app for Industry Hack
 
 **Crane functions:**
-setCranePosition(bridge, hoist, trolley)
-getPositions(callback)
+* setCranePosition(bridge, hoist, trolley)
+* getPositions(callback)
 
-Callback receives 1 parameter: 
+*** Callback receives 1 parameter: ***
 {
 bridge: 1000,
 hoist: 1000,
