@@ -21,7 +21,7 @@
             <button type="button" class="corner-btn right-corner" id="summon-crane-btn"></button>
         </header>
 
-        <section class="ui-content task-content incoming-start" data-context="incoming-start">
+        <section class="ui-content task-content incoming-start hidden" data-context="incoming-start">
             <div class="main-message">TASK:<br />Incoming cargo</div>
         </section>
         
@@ -48,8 +48,12 @@
         <section class="ui-content task-content  hidden outgoing-transfer" data-context="outgoing-transfer">
             <div class="main-message">Transfer item to loading area</div>
         </section>
+        
+        <section class="ui-content task-content hidden" data-context="no-tasks">
+            <div class="main-message">Congrats! There are no more tasks.</div>
+        </section>
 
-        <footer class="ui-footer task-actions incoming-start" data-context="incoming-start">
+        <footer class="ui-footer task-actions incoming-start hidden" data-context="incoming-start">
             <button type="button" class="ui-btn confirm-btn">start</button>
         </footer>
 
@@ -72,7 +76,11 @@
         </footer>
 
         <footer class="ui-footer task-actions hidden outgoing-transfer" data-context="outgoing-transfer">
-            <button type="button" class="ui-btn confirm-btn">transfer complete</button>
+            <button type="button" class="ui-btn confirm-btn">transfer ok</button>
+        </footer>
+
+        <footer class="ui-footer task-actions no-tasks" data-context="no-tasks">
+            <button type="button" class="ui-btn confirm-btn">refresh</button>
         </footer>
         
     </div>

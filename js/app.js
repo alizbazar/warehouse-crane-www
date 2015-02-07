@@ -44,16 +44,51 @@ define({
     }
 });
 
+var baseUrl = 'http://localhost:5000';
+
+var item = null;
+var newItem = null;
+
+var mock = {
+    items: [
+        {name: "Koskenkorva", info: "weight:1000kg; dimensions:1000x780x460"},
+        {name: "Virun Valkee", info: "weight:850kg; dimensions:800x860x500"},
+        {name: "Jaloviina", info: "weight:900kg; dimensions:900x800x520"}
+    ],
+    simulateNewItem: function() {
+        $('.task-actions.incoming-select .ui-btn').removeAttr('disabled');
+        var r = parseInt(Math.random() * 100,10)%3;
+        newItem = mock.items[r];
+    }
+};
+
+function resetAll() {
+    switchView('no-tasks');
+    item = null;
+    newItem = null;
+    getNextTask();
+}
+
 function getNextTask(callback) {
     // GET NEXT ITEM
-    // CACHE it's data
-    console.log('start');
-    var a = Math.random();
-    if (a > 0.5) {
-        switchView('incoming-start');
-    } else {
-        switchView('outgoing-start');
-    }
+
+    $.get(baseUrl + '/api/getNextTask', function(task) {
+        if (task.success == false) {
+            switchView('no-tasks');
+        }
+        console.log(task);
+        if (task.name == 'GET_ITEM') {
+            // CACHE it's data
+            item = task.item;
+            switchView('outgoing-start');
+        } else if (task.name == 'INCOMING_CARGO') {
+            switchView('incoming-start');
+        } else {
+            // TODO: error handling if no task name
+            switchView('no-tasks');
+        }
+    });
+
 }
 
 // Relevant divs:
@@ -67,26 +102,37 @@ function switchView(view) {
 $('.ui-page').on('click', '.ui-btn', function(e) {
     var $btn = $(this);
     var context = $btn.closest('footer').data('context');
-    console.log('context:' + context);
 
     if (context == 'incoming-start') {
         switchView('incoming-select');
+        newItem = null;
         // Switch .task-content text with item name when in proximity
         // toggle disabled state of the button
-        setTimeout(function() { $('.task-actions.incoming-select .ui-btn').removeAttr('disabled') }, 1000);
+        setTimeout(function() {
+            mock.simulateNewItem();
+        }, 1000);
 
     } else if (context == 'incoming-select') {
         // TODO: select item, send to server
+        if (!newItem) {
+            console.log('error: newItem is NULL');
+            resetAll();
+            return;
+        }
+
+        $.post(baseUrl + '/api/item/create', newItem, function(data) {
+            console.log(data);
+        });
         switchView('incoming-transfer');
 
-
     } else if (context == 'incoming-transfer') {
+        var positions = getPositions();
+        console.log('pos:', positions);
         // TODO: get crane location, save location to item data 
         switchView('incoming-more');
     } else if (context == 'incoming-more') {
         // TODO: identify yes / no
         if ($btn.hasClass('confirm-btn')) {
-            console.log('yes');
             switchView('incoming-start');
         } else {
             // TODO: no => mark task complete && getNextItem
@@ -104,3 +150,5 @@ $('.ui-page').on('click', '.ui-btn', function(e) {
     }
 });
 
+
+getNextTask();
