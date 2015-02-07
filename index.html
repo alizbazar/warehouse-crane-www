@@ -12,7 +12,16 @@
     <script src="./js/timerPageControl.js"></script>
     <script type="text/javascript" src="js/jquery-1.9.1.js"></script>
     <script type="text/javascript" src="js/crane.js"></script>
-    
+          <script>
+  console.log("OERR 1");
+  	getCranePosition(myCallback);
+  console.log("OERR 2");
+  	
+  	function myCallback(response) {
+  		console.log("CALLBACK CALLED");
+  		console.log(response);
+  	}
+  </script>
     <div class="ui-page ui-page-active" id="task-page">
         
         <header class="task-header">
