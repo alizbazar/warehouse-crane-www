@@ -9,37 +9,70 @@
     <link rel="stylesheet" type="text/css" href="./css/style.css"/>
 </head>
 <body>
-    <script src="./js/timerPageControl.js"></script>
+    <!--<script src="./js/timerPageControl.js"></script>-->
     <script type="text/javascript" src="js/jquery-1.9.1.js"></script>
     <script type="text/javascript" src="js/crane.js"></script>
     
     <div class="ui-page ui-page-active" id="task-page">
         
         <header class="task-header">
-        <button type="button" class="corner-btn left-corner" id="move-crane-menu-btn"></button>
-        
-        <button type="button" class="corner-btn right-corner" id="summon-crane-btn"></button>
+            <button type="button" class="corner-btn left-corner" id="move-crane-menu-btn"></button>
+            
+            <button type="button" class="corner-btn right-corner" id="summon-crane-btn"></button>
         </header>
-        
-        <section class="ui-content" id="task-content">
-            <div>
-            -- Current Task --<br><br>
-            Unload cargo
-            </div>
+
+        <section class="ui-content task-content incoming-start" data-context="incoming-start">
+            <div class="main-message">Store incoming cargo</div>
         </section>
         
-        <footer class="ui-footer" id="task-footer">
-            
-            <button type="button" class="ui-btn confirm-btn" id="unload-complete">Unload Complete</button>
-            <button type="button" class="ui-btn confirm-btn hidden" id="crane-attached-unload">Crane Attached</button>
-            <button type="button" class="ui-btn confirm-btn hidden" id="item-unloaded">Item Unloaded</button>
-            
-            
-            <button type="button" class="ui-btn confirm-btn hidden" id="move-to-item">Move Crane to Item</button>
-            <button type="button" class="ui-btn confirm-btn hidden" id="crane-attached-load">Crane Attached</button>
-            <button type="button" class="ui-btn confirm-btn hidden" id="item-loaded">Task Complete</button>
-            
-            
+        <section class="ui-content task-content hidden incoming-select" data-context="incoming-select">
+            <div class="main-message">Select an item</div>
+        </section>
+        
+        <section class="ui-content task-content hidden incoming-transfer" data-context="incoming-transfer">
+            <div class="main-message">Transfer item to storage</div>
+        </section>
+        
+        <section class="ui-content task-content hidden incoming-more" data-context="incoming-more">
+            <div class="main-message">More items to store?</div>
+        </section>
+        
+        <section class="ui-content task-content hidden outgoing-start" data-context="outgoing-start">
+            <div class="main-message">Get item from storage</div>
+        </section>
+        
+        <section class="ui-content task-content hidden outgoing-map" data-context="outgoing-map">
+            <div id="map">MAP</div>
+        </section>
+        
+        <section class="ui-content task-content  hidden outgoing-transfer" data-context="outgoing-transfer">
+            <div class="main-message">Transfer item to loading area</div>
+        </section>
+
+        <footer class="ui-footer task-actions incoming-start" data-context="incoming-start">
+            <button type="button" class="ui-btn confirm-btn">start</button>
+        </footer>
+
+        <footer class="ui-footer task-actions hidden incoming-select" data-context="incoming-select">
+            <button type="button" class="ui-btn confirm-btn">select</button>
+        </footer>
+
+        <footer class="ui-footer task-actions hidden incoming-transfer" data-context="incoming-transfer">
+            <button type="button" class="ui-btn confirm-btn">save location</button>
+        </footer>
+
+        <footer class="ui-footer task-actions hidden incoming-more" data-context="incoming-more"><button type="button" class="ui-btn btn-half cancel-btn">no</button><button type="button" class="ui-btn btn-half confirm-btn">yes</button></footer>
+
+        <footer class="ui-footer task-actions hidden outgoing-start" data-context="outgoing-start">
+            <button type="button" class="ui-btn confirm-btn">start</button>
+        </footer>
+
+        <footer class="ui-footer task-actions hidden outgoing-map" data-context="outgoing-map">
+            <button type="button" class="ui-btn confirm-btn">select</button>
+        </footer>
+
+        <footer class="ui-footer task-actions hidden outgoing-transfer" data-context="outgoing-transfer">
+            <button type="button" class="ui-btn confirm-btn">transfer complete</button>
         </footer>
         
     </div>
