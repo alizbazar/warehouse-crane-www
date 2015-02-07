@@ -12,6 +12,7 @@
     <content src="index.html"/>
     <feature name="http://tizen.org/feature/network.internet"/>
     <feature name="http://tizen.org/feature/network.wifi"/>
+    <feature name="http://tizen.org/feature/network.bluetooth"/>
     <icon src="icon.png"/>
     <icon src="icon.png"/>
     <name>GearApp</name>
@@ -20,6 +21,37 @@
     <tizen:privilege name="http://tizen.org/privilege/application.info"/>
     <tizen:privilege name="http://tizen.org/privilege/application.launch"/>
     <tizen:privilege name="http://tizen.org/privilege/internet"/>
+    <tizen:privilege name="http://developer.samsung.com/privilege/accessoryprotocol"/>
+    <tizen:privilege name="http://developer.samsung.com/privilege/healthinfo"/>
+    <tizen:privilege name="http://developer.samsung.com/privilege/irled"/>
+    <tizen:privilege name="http://tizen.org/privilege/appmanager.certificate"/>
+    <tizen:privilege name="http://tizen.org/privilege/appmanager.kill"/>
+    <tizen:privilege name="http://tizen.org/privilege/audiorecorder"/>
+    <tizen:privilege name="http://tizen.org/privilege/call"/>
+    <tizen:privilege name="http://tizen.org/privilege/camera"/>
+    <tizen:privilege name="http://tizen.org/privilege/content.read"/>
+    <tizen:privilege name="http://tizen.org/privilege/content.write"/>
+    <tizen:privilege name="http://tizen.org/privilege/download"/>
+    <tizen:privilege name="http://tizen.org/privilege/filesystem.read"/>
+    <tizen:privilege name="http://tizen.org/privilege/filesystem.write"/>
+    <tizen:privilege name="http://tizen.org/privilege/location"/>
+    <tizen:privilege name="http://tizen.org/privilege/mediacapture"/>
+    <tizen:privilege name="http://tizen.org/privilege/notification"/>
+    <tizen:privilege name="http://tizen.org/privilege/package.info"/>
+    <tizen:privilege name="http://tizen.org/privilege/packagemanager.install"/>
+    <tizen:privilege name="http://tizen.org/privilege/setting"/>
+    <tizen:privilege name="http://tizen.org/privilege/system"/>
+    <tizen:privilege name="http://tizen.org/privilege/systemmanager"/>
+    <tizen:privilege name="http://tizen.org/privilege/unlimitedstorage"/>
+    	 
+	<tizen:privilege name="http://tizen.org/privilege/bluetooth"/>
+	<tizen:privilege name="http://tizen.org/privilege/bluetooth.admin"/>
+	<tizen:privilege name="http://tizen.org/privilege/bluetooth.gap"/>
+	<tizen:privilege name="http://tizen.org/privilege/bluetooth.health"/>
+	<tizen:privilege name="http://tizen.org/privilege/bluetooth.opp"/>
+	<tizen:privilege name="http://tizen.org/privilege/bluetooth.spp"/>
+	<tizen:privilege name="http://tizen.org/privilege/bluetoothmanager"/>
+    
     <tizen:setting background-support="enable"/>
 	 
 	 
