@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width,user-scalable=no">
+    <meta charset="utf-8"/>
+    <meta name="description" content="StopWatch"/>
+    <title>TeamJEA_App</title>
+    <link rel="stylesheet" href="lib/tau/wearable/theme/default/tau.css" />
+    <link rel="stylesheet" type="text/css" href="./css/style.css"/>
+</head>
+<body>
+    <script src="./js/timerPageControl.js"></script>
+    
+    <div class="ui-page ui-page-active" id="task-page">
+        
+        <header class="task-header">
+        <button type="button" class="corner-btn left-corner" id="move-crane-menu-btn"></button>
+        
+        <button type="button" class="corner-btn right-corner" id="summon-crane-btn"></button>
+        </header>
+        
+        <section class="ui-content" id="task-content">
+            <div>
+            -- Current Task --<br><br>
+            Unload cargo
+            </div>
+        </section>
+        
+        <footer class="ui-footer" id="task-footer">
+            
+            <button type="button" class="ui-btn confirm-btn" id="unload-complete">Unload Complete</button>
+            <button type="button" class="ui-btn confirm-btn hidden" id="crane-attached-unload">Crane Attached</button>
+            <button type="button" class="ui-btn confirm-btn hidden" id="item-unloaded">Item Unloaded</button>
+            
+            
+            <button type="button" class="ui-btn confirm-btn hidden" id="move-to-item">Move Crane to Item</button>
+            <button type="button" class="ui-btn confirm-btn hidden" id="crane-attached-load">Crane Attached</button>
+            <button type="button" class="ui-btn confirm-btn hidden" id="item-loaded">Task Complete</button>
+            
+            
+        </footer>
+        
+    </div>
+
+    <div class="ui-page" id="move-crane-page">
+        <header>
+        </header>
+        
+        <section>
+        </section>
+        
+      <footer>
+        </footer>
+    </div>
+
+    <div class="ui-page" id="no-tasks-page">
+    </div>
+
+    <script src="./lib/tau/wearable/js/tau.js"></script>
+    <script src="./js/core/core.js" data-main="./js/app.js"></script>
+
+</body>
+</html>
