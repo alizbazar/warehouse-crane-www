@@ -1,10 +1,13 @@
-var baseUrl = 'http://192.168.1.213:5000';
+//var baseUrl = 'http://192.168.1.213:5000';
+var baseUrl = 'http://192.168.240.197:5000';
 
 /*global define, console*/
 
 /**
  * App module
  */
+
+isAutoMapUpdateOn = false;
 
 define({
     name: 'app',
@@ -229,6 +232,10 @@ $('.ui-page').on('click', '.ui-btn', function(e) {
             updateMap(pos, item);
         });
     } else if (context == 'outgoing-map') {
+    	if(!isAutoMapUpdateOn) {
+    		isAutoMapUpdateOn = true;
+    		setTimeout(autoUpdateMap, 1000);
+    	}
         // (change item status as to LEAVING_STORAGE) -> done with setting task status to STARTED
         $.post(baseUrl + '/api/task/' + task._id + '/setStatus', {status: 'STARTED'}, function(data) {
             console.log(data);
@@ -257,6 +264,18 @@ $('#move-crane-to-target').on('click', function() {
         setCranePosition(item.location.bridge, item.location.hoist, item.location.trolley);
     }
 });
+
+function autoUpdateMap() {
+	console.log("autoUpdateMap");
+	if (context == 'outgoing-map') {
+		console.log("AUTOUPDATING");
+		getPositions(function(pos) {
+		    switchView('outgoing-map');
+		    updateMap(pos, item);
+		});
+	}
+	setTimeout(autoUpdateMap, 1000);
+}
 
 
 getNextTask();
