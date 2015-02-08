@@ -26,11 +26,11 @@
         </section>
         
         <section class="ui-content task-content hidden incoming-select" data-context="incoming-select">
-            <div class="main-message">Select an item</div>
+            <div class="main-message"><span class="default-message">Select an item</span><span class="alt-message hidden"></span></div>
         </section>
         
         <section class="ui-content task-content hidden incoming-transfer" data-context="incoming-transfer">
-            <div class="main-message">Transfer item to storage</div>
+            <div class="main-message">Move item to storage</div>
         </section>
         
         <section class="ui-content task-content hidden incoming-more" data-context="incoming-more">
@@ -47,9 +47,10 @@
 	            <div id="crane" class="map-elem"><div id="circle-green"></div>Crane</div>
 	            <div id="tag" class="map-elem"><div id="circle-yellow"></div>Beacon</div>
             </div>
+            <div id="mapItemName"></div>
         </section>
         
-        <section class="ui-content task-content  hidden outgoing-transfer" data-context="outgoing-transfer">
+        <section class="ui-content task-content hidden outgoing-transfer" data-context="outgoing-transfer">
             <div class="main-message">Transfer item to loading area</div>
         </section>
         
