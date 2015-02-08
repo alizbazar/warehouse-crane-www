@@ -46,6 +46,7 @@ define({
 
 var baseUrl = 'http://localhost:5000';
 
+var task = null;
 var item = null;
 var newItem = null;
 
@@ -65,6 +66,7 @@ var mock = {
 function resetAll() {
     switchView('no-tasks');
     item = null;
+    task = null;
     newItem = null;
     getNextTask();
 }
@@ -77,6 +79,7 @@ function getNextTask(callback) {
             switchView('no-tasks');
         }
         console.log(task);
+        task = task;
         if (task.name == 'GET_ITEM') {
             // CACHE it's data
             item = task.item;
@@ -97,6 +100,59 @@ function getNextTask(callback) {
 function switchView(view) {
     $('.task-content, .task-actions').not('.' + view).toggleClass('hidden', true);
     $('.task-content.' + view + ', .task-actions.' + view).toggleClass('hidden', false);
+}
+
+function updateMap(pos, item) {
+    var sourceCoords = {
+        item: {
+            x: item.location.bridge,
+            y: item.location.trolley,
+            z: item.location.hoist
+        },
+        beacon: {
+            x: pos.x,
+            y: pos.y,
+            z: pos.z
+        },
+        crane: {
+            x: pos.bridge,
+            y: pos.trolley,
+            z: pos.hoist
+        }
+    };
+
+    console.log(sourceCoords);
+
+    // do the conversion to 0-100
+    var convert = {
+        x: function(val) {
+            var scale = BRIDGE_LEFT - BRIDGE_RIGHT;
+            return (val - BRIDGE_RIGHT) / scale * 100;
+        },
+        y: function(val) {
+            var scale = TROLLEY_FAR - TROLLEY_NEAR;
+            return (val - TROLLEY_NEAR) / scale * 100;
+        }
+    };
+
+    var destCoords = {
+        item: {
+            x: convert.x(sourceCoords.item.x),
+            y: convert.y(sourceCoords.item.y)
+        },
+        beacon: {
+            x: convert.x(sourceCoords.beacon.x),
+            y: convert.y(sourceCoords.beacon.y)
+        },
+        crane: {
+            x: convert.x(sourceCoords.crane.x),
+            y: convert.y(sourceCoords.crane.y)
+        }
+    };
+    console.log(destCoords);
+
+    // TODO: update map values
+
 }
 
 $('.ui-page').on('click', '.ui-btn', function(e) {
@@ -122,30 +178,58 @@ $('.ui-page').on('click', '.ui-btn', function(e) {
 
         $.post(baseUrl + '/api/item/create', newItem, function(data) {
             console.log(data);
+            item = data.item;
         });
         switchView('incoming-transfer');
 
     } else if (context == 'incoming-transfer') {
-        var positions = getPositions();
-        console.log('pos:', positions);
-        // TODO: get crane location, save location to item data 
-        switchView('incoming-more');
+        // bridge: "7030"hoist: "1063"trolley: "1157"x: 7634y: 972z: 1227
+        getPositions(function(pos) {
+            $.post(baseUrl + '/api/item/' + item._id + '/setLocation', {bridge: pos.bridge, hoist: pos.hoist, trolley: pos.trolley}, function(data) {
+                console.log(data);
+                switchView('incoming-more');
+                console.log('pos:', pos);
+            });
+        });
+
+        // get crane location, save location to item data 
     } else if (context == 'incoming-more') {
-        // TODO: identify yes / no
+        // identify yes / no
         if ($btn.hasClass('confirm-btn')) {
-            switchView('incoming-start');
+            switchView('incoming-select');
+            newItem = null;
+            
+            // Switch .task-content text with item name when in proximity
+            // toggle disabled state of the button
+            setTimeout(function() {
+                mock.simulateNewItem();
+            }, 1000);
         } else {
-            // TODO: no => mark task complete && getNextItem
+            // no => mark task complete && getNextItem
+            $.post(baseUrl + '/api/task/' + task._id + '/setStatus', {status: 'COMPLETED'}, function(data) {
+                console.log(data);
+                item = null;
+                task = null;
+            });
             getNextTask();
         }
     } else if (context == 'outgoing-start') {
-        // TODO: set task status to STARTED && get own location & crane location, draw crane, item & me on the map && display item identifier
+        // TODO: (set task status to STARTED)?? && get own location & crane location, draw crane, item & me on the map && display item identifier
+        var pos = getPositions();
+        updateMap(pos, item);
         switchView('outgoing-map');
     } else if (context == 'outgoing-map') {
-        // TODO: change item status as to LEAVING_STORAGE
+        // (change item status as to LEAVING_STORAGE) -> done with setting task status to STARTED
+        $.post(baseUrl + '/api/task/' + task._id + '/setStatus', {status: 'STARTED'}, function(data) {
+            console.log(data);
+        });
+        // TODO: highlight when item close by
         switchView('outgoing-transfer');
     } else if (context == 'outgoing-transfer') {
         // TODO: remove item from storage && getNextItem
+        $.post(baseUrl + '/api/task/' + task._id + '/setStatus', {status: 'COMPLETED'}, function(data) {
+            console.log(data);
+        });
         getNextTask();
     }
 });
