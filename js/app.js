@@ -1,5 +1,5 @@
-//var baseUrl = 'http://192.168.1.213:5000';
-var baseUrl = 'http://192.168.240.197:5000';
+var baseUrl = 'http://192.168.1.213:5000';
+//var baseUrl = 'http://192.168.240.197:5000';
 
 /*global define, console*/
 
@@ -209,7 +209,7 @@ $('.ui-page').on('click', '.ui-btn', function(e) {
 
     var autoUpdateMap = function() {
         console.log("autoUpdateMap");
-        if (context == 'outgoing-map') {
+        if (context == 'outgoing-start') {
             console.log("AUTOUPDATING");
             getPositions(function(pos) {
                 if (item) {
