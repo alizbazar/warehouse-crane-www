@@ -44,7 +44,7 @@ define({
     }
 });
 
-var baseUrl = 'http://localhost:5000';
+var baseUrl = 'http://192.168.43.70:5000';
 
 var task = null;
 var item = null;
@@ -127,11 +127,11 @@ function updateMap(pos, item) {
     var convert = {
         x: function(val) {
             var scale = BRIDGE_LEFT - BRIDGE_RIGHT;
-            return (val - BRIDGE_RIGHT) / scale * 100;
+            return Math.floor((val - BRIDGE_RIGHT) / scale * 100);
         },
         y: function(val) {
             var scale = TROLLEY_FAR - TROLLEY_NEAR;
-            return (val - TROLLEY_NEAR) / scale * 100;
+            return Math.floor((val - TROLLEY_NEAR) / scale * 100);
         }
     };
 
@@ -152,14 +152,14 @@ function updateMap(pos, item) {
     console.log(destCoords);
 
     // TODO: update map values
-    $("#item").css("left", destCoords.item.x);
-    $("#item").css("top", destCoords.item.y);
+    $("#item").css("left", destCoords.item.x+"%");
+    $("#item").css("top", destCoords.item.y+"%");
  
-    $("#tag").css("left", destCoords.tag.x);
-    $("#tag").css("top", destCoords.tag.y);
+    $("#tag").css("left", destCoords.tag.x+"%");
+    $("#tag").css("top", destCoords.tag.y+"%");
     
-    $("#crane").css("left", destCoords.crane.x);
-    $("#crane").css("top", destCoords.crane.y);
+    $("#crane").css("left", destCoords.crane.x+"%");
+    $("#crane").css("top", destCoords.crane.y+"%");
 
 }
 
