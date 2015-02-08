@@ -60,7 +60,8 @@ function publishChatService() {
 	           console.log('The socket is closed.');
 	           serviceSocket = null;
 	       };
-	   }});
+	   }
+   });
 	    
    /*,
      // Error handler

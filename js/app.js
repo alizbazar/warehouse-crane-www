@@ -152,6 +152,14 @@ function updateMap(pos, item) {
     console.log(destCoords);
 
     // TODO: update map values
+    $("#item").css("left", destCoords.item.x);
+    $("#item").css("top", destCoords.item.y);
+ 
+    $("#beacon").css("left", destCoords.beacon.x);
+    $("#beacon").css("top", destCoords.beacon.y);
+    
+    $("#crane").css("left", destCoords.crane.x);
+    $("#crane").css("top", destCoords.crane.y);
 
 }
 
