@@ -1,3 +1,5 @@
+var baseUrl = 'http://192.168.1.213:5000';
+
 /*global define, console*/
 
 /**
@@ -44,7 +46,6 @@ define({
     }
 });
 
-var baseUrl = 'http://192.168.43.70:5000';
 
 var task = null;
 var item = null;
