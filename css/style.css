@@ -173,3 +173,28 @@ button.ui-btn.btn-half {
     display: inline-block;
     width: 50%;
 }
+
+.map-item {
+	position: absolute;
+}
+
+#circle-red {
+    background: #f00;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+#circle-green {
+    background: #0f0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+#circle-yellow {
+    background: #ff0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
