@@ -190,21 +190,21 @@ button.ui-btn.btn-half {
 
 #circle-red {
     background: #f00;
-    width: 10px;
-    height: 10px;
+    width: 25px;
+    height: 25px;
     border-radius: 50%;
 }
 
 #circle-green {
     background: #0f0;
-    width: 10px;
-    height: 10px;
+    width: 25px;
+    height: 25px;
     border-radius: 50%;
 }
 
 #circle-yellow {
     background: #ff0;
-    width: 10px;
-    height: 10px;
+    width: 25px;
+    height: 25px;
     border-radius: 50%;
 }
