@@ -65,6 +65,7 @@ var mock = {
 
 function resetAll() {
     switchView('no-tasks');
+    $('.task-actions.incoming-select .ui-btn').attr('disabled', 'disabled');
     item = null;
     task = null;
     newItem = null;
@@ -163,6 +164,36 @@ function updateMap(pos, item) {
 
 }
 
+var spinner = (function() {
+    var $spinner = $('#spinner');
+    var $disabledButtons = null;
+
+    var stop = function() {
+        $spinner.toggleClass('hidden', true);
+        if (!!$disabledButtons) {
+            $disabledButtons.removeAttr('disabled');
+        }
+        $disabledButtons = null;
+    };
+
+    return {
+        spin: function() {
+            if (!!$disabledButtons) {
+                return;
+            }
+            $spinner.toggleClass('hidden', false);
+            $disabledButtons = $('.task-actions').not('.hidden').find('.ui-btn').add('#move-crane-to-target').add('#move-crane-here');
+            $disabledButtons.attr('disabled', 'disabled');
+            setTimeout(function() {
+                if ($disabledButtons) {
+                    stop();
+                }
+            }, 5000);
+        },
+        stop: stop
+    }
+}());
+
 $('.ui-page').on('click', '.ui-btn', function(e) {
     var $btn = $(this);
     var context = $btn.closest('footer').data('context');
@@ -184,19 +215,23 @@ $('.ui-page').on('click', '.ui-btn', function(e) {
             return;
         }
 
+        spinner.spin();
         $.post(baseUrl + '/api/item/create', newItem, function(data) {
             console.log(data);
             item = data.item;
+            switchView('incoming-transfer');
+            spinner.stop();
         });
-        switchView('incoming-transfer');
 
     } else if (context == 'incoming-transfer') {
         // bridge: "7030"hoist: "1063"trolley: "1157"x: 7634y: 972z: 1227
+        spinner.spin();
         getPositions(function(pos) {
             $.post(baseUrl + '/api/item/' + item._id + '/setLocation', {bridge: pos.bridge, hoist: pos.hoist, trolley: pos.trolley}, function(data) {
                 console.log(data);
                 switchView('incoming-more');
                 console.log('pos:', pos);
+                spinner.stop();
             });
         });
 
@@ -206,6 +241,7 @@ $('.ui-page').on('click', '.ui-btn', function(e) {
         if ($btn.hasClass('confirm-btn')) {
             switchView('incoming-select');
             newItem = null;
+            $('.task-actions.incoming-select .ui-btn').attr('disabled', 'disabled');
 
             // Switch .task-content text with item name when in proximity
             // toggle disabled state of the button
@@ -214,46 +250,62 @@ $('.ui-page').on('click', '.ui-btn', function(e) {
             }, 1000);
         } else {
             // no => mark task complete && getNextItem
+            spinner.spin();
             $.post(baseUrl + '/api/task/' + task._id + '/setStatus', {status: 'COMPLETED'}, function(data) {
                 console.log(data);
                 item = null;
                 task = null;
+                resetAll();
+                spinner.stop();
             });
-            getNextTask();
         }
     } else if (context == 'outgoing-start') {
         // TODO: (set task status to STARTED)?? && get own location & crane location, draw crane, item & me on the map && display item identifier
+        spinner.spin();
         getPositions(function(pos) {
             switchView('outgoing-map');
             updateMap(pos, item);
+            spinner.stop();
         });
     } else if (context == 'outgoing-map') {
         // (change item status as to LEAVING_STORAGE) -> done with setting task status to STARTED
+        spinner.spin();
         $.post(baseUrl + '/api/task/' + task._id + '/setStatus', {status: 'STARTED'}, function(data) {
             console.log(data);
+            switchView('outgoing-transfer');
+            spinner.stop();
         });
         // TODO: highlight when item close by
-        switchView('outgoing-transfer');
     } else if (context == 'outgoing-transfer') {
         // TODO: remove item from storage && getNextItem
+        spinner.spin();
         $.post(baseUrl + '/api/task/' + task._id + '/setStatus', {status: 'COMPLETED'}, function(data) {
             console.log(data);
+            spinner.stop();
+            resetAll();
         });
-        getNextTask();
     } else if (context == 'no-tasks') {
-        getNextTask();
+        resetAll();
     }
 });
 
 $('#move-crane-here').on('click', function() {
+    console.log('crane-moving-here');
+    spinner.spin();
     getPositions(function(pos) {
-        setCranePosition(pos.x, pos.z, pos.y);
+        setCranePosition(pos.x, pos.z, pos.y, function() {
+            spinner.stop();
+        });
     });
 });
 
 $('#move-crane-to-target').on('click', function() {
+    console.log('crane-moving-to-target');
     if (item && item.location) {
-        setCranePosition(item.location.bridge, item.location.hoist, item.location.trolley);
+        spinner.spin();
+        setCranePosition(item.location.bridge, item.location.hoist, item.location.trolley, function() {
+            spinner.stop();
+        });
     }
 });
 

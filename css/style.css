@@ -214,3 +214,16 @@ button.ui-btn.btn-half {
     height: 25px;
     border-radius: 50%;
 }
+
+#spinner {
+    width: 64px;
+    height: 64px;
+    background-image: url('/img/spinner.gif');
+    background-position: 0 0;
+    background-repeat: no-repeat;
+    background-size: 64px 64px; 
+    position: absolute;
+    left: 50%;
+    margin-left: -32px;
+    margin-top: 12px;
+}
