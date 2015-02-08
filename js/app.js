@@ -172,12 +172,17 @@ var spinner = (function() {
     var $spinner = $('#spinner');
     var $disabledButtons = null;
 
-    var stop = function() {
+    var stop = function(notification) {
         $spinner.toggleClass('hidden', true);
         if (!!$disabledButtons) {
             $disabledButtons.removeAttr('disabled');
         }
         $disabledButtons = null;
+        if (notification) {
+            $.post('/api/notify', {"notification": notification}, function() {
+                console.log('notified server');
+            });
+        }
     };
 
     return {
@@ -190,7 +195,7 @@ var spinner = (function() {
             $disabledButtons.attr('disabled', 'disabled');
             setTimeout(function() {
                 if ($disabledButtons) {
-                    stop();
+                    stop('Stopped by TIMEOUT');
                 }
             }, 5000);
         },
@@ -315,7 +320,7 @@ $('#move-crane-here').on('click', function() {
     spinner.spin();
     getPositions(function(pos) {
         setCranePosition(pos.x, pos.z, pos.y, function() {
-            spinner.stop();
+            spinner.stop('Crane target set');
         });
     });
 });
@@ -325,7 +330,7 @@ $('#move-crane-to-target').on('click', function() {
     if (item && item.location) {
         spinner.spin();
         setCranePosition(item.location.bridge, item.location.hoist, item.location.trolley, function() {
-            spinner.stop();
+            spinner.stop('Crane target set');
         });
     }
 });
