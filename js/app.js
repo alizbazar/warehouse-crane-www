@@ -202,6 +202,19 @@ $('.ui-page').on('click', '.ui-btn', function(e) {
     var $btn = $(this);
     var context = $btn.closest('footer').data('context');
 
+    var autoUpdateMap = function() {
+        console.log("autoUpdateMap");
+        if (context == 'outgoing-map') {
+            console.log("AUTOUPDATING");
+            getPositions(function(pos) {
+                if (item) {
+                  updateMap(pos, item);
+                }
+            });
+        }
+        setTimeout(autoUpdateMap, 1000);
+    }
+
     if (context == 'incoming-start') {
         switchView('incoming-select');
         newItem = null;
@@ -316,18 +329,6 @@ $('#move-crane-to-target').on('click', function() {
         });
     }
 });
-
-function autoUpdateMap() {
-	console.log("autoUpdateMap");
-	if (context == 'outgoing-map') {
-		console.log("AUTOUPDATING");
-		getPositions(function(pos) {
-		    switchView('outgoing-map');
-		    updateMap(pos, item);
-		});
-	}
-	setTimeout(autoUpdateMap, 1000);
-}
 
 
 getNextTask();
