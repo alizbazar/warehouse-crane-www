@@ -208,9 +208,9 @@ $('.ui-page').on('click', '.ui-btn', function(e) {
     var context = $btn.closest('footer').data('context');
 
     var autoUpdateMap = function() {
-        //console.log("autoUpdateMap");
-        if (context == 'outgoing-map') {
-            //console.log("AUTOUPDATING");
+        console.log("autoUpdateMap");
+        if (context == 'outgoing-start') {
+            console.log("AUTOUPDATING");
             getPositions(function(pos) {
                 if (item) {
                   updateMap(pos, item);
