@@ -109,7 +109,7 @@ function updateMap(pos, item) {
             y: item.location.trolley,
             z: item.location.hoist
         },
-        beacon: {
+        tag: {
             x: pos.x,
             y: pos.y,
             z: pos.z
@@ -140,9 +140,9 @@ function updateMap(pos, item) {
             x: convert.x(sourceCoords.item.x),
             y: convert.y(sourceCoords.item.y)
         },
-        beacon: {
-            x: convert.x(sourceCoords.beacon.x),
-            y: convert.y(sourceCoords.beacon.y)
+        tag: {
+            x: convert.x(sourceCoords.tag.x),
+            y: convert.y(sourceCoords.tag.y)
         },
         crane: {
             x: convert.x(sourceCoords.crane.x),
@@ -155,8 +155,8 @@ function updateMap(pos, item) {
     $("#item").css("left", destCoords.item.x);
     $("#item").css("top", destCoords.item.y);
  
-    $("#beacon").css("left", destCoords.beacon.x);
-    $("#beacon").css("top", destCoords.beacon.y);
+    $("#tag").css("left", destCoords.tag.x);
+    $("#tag").css("top", destCoords.tag.y);
     
     $("#crane").css("left", destCoords.crane.x);
     $("#crane").css("top", destCoords.crane.y);
