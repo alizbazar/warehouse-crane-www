@@ -44,7 +44,7 @@ define({
     }
 });
 
-var baseUrl = 'http://localhost:5000';
+var baseUrl = 'http://192.168.43.70:5000';
 
 var task = null;
 var item = null;
