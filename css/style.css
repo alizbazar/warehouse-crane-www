@@ -74,11 +74,11 @@
 	float:right;
 }
 
-#summon-crane-btn {
+#move-crane-here {
 	background-image:url(../img/gearapp/overhead_crane.png)
 }
 
-#move-crane-menu-btn {
+#move-crane-to-target {
 	background-image:url(../img/gearapp/4_direction.png)
 }
 

@@ -245,5 +245,17 @@ $('.ui-page').on('click', '.ui-btn', function(e) {
     }
 });
 
+$('#move-crane-here').on('click', function() {
+    getPositions(function(pos) {
+        setCranePosition(pos.x, pos.z, pos.y);
+    });
+});
+
+$('#move-crane-to-target').on('click', function() {
+    if (item && item.location) {
+        setCranePosition(item.location.bridge, item.location.hoist, item.location.trolley);
+    }
+});
+
 
 getNextTask();
