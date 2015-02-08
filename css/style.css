@@ -184,6 +184,12 @@ button.ui-btn.btn-half {
     width: 50%;
 }
 
+#map {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
 .map-elem {
 	position: absolute;
 }
