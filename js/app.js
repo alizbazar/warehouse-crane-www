@@ -74,12 +74,12 @@ function resetAll() {
 function getNextTask(callback) {
     // GET NEXT ITEM
 
-    $.get(baseUrl + '/api/getNextTask', function(task) {
-        if (task.success == false) {
+    $.get(baseUrl + '/api/getNextTask', function(data) {
+        if (data.success == false) {
             switchView('no-tasks');
         }
-        console.log(task);
-        task = task;
+        console.log(data);
+        task = data;
         if (task.name == 'GET_ITEM') {
             // CACHE it's data
             item = task.item;
@@ -198,7 +198,7 @@ $('.ui-page').on('click', '.ui-btn', function(e) {
         if ($btn.hasClass('confirm-btn')) {
             switchView('incoming-select');
             newItem = null;
-            
+
             // Switch .task-content text with item name when in proximity
             // toggle disabled state of the button
             setTimeout(function() {
@@ -215,9 +215,10 @@ $('.ui-page').on('click', '.ui-btn', function(e) {
         }
     } else if (context == 'outgoing-start') {
         // TODO: (set task status to STARTED)?? && get own location & crane location, draw crane, item & me on the map && display item identifier
-        var pos = getPositions();
-        updateMap(pos, item);
-        switchView('outgoing-map');
+        getPositions(function(pos) {
+            switchView('outgoing-map');
+            updateMap(pos, item);
+        });
     } else if (context == 'outgoing-map') {
         // (change item status as to LEAVING_STORAGE) -> done with setting task status to STARTED
         $.post(baseUrl + '/api/task/' + task._id + '/setStatus', {status: 'STARTED'}, function(data) {
@@ -230,6 +231,8 @@ $('.ui-page').on('click', '.ui-btn', function(e) {
         $.post(baseUrl + '/api/task/' + task._id + '/setStatus', {status: 'COMPLETED'}, function(data) {
             console.log(data);
         });
+        getNextTask();
+    } else if (context == 'no-tasks') {
         getNextTask();
     }
 });

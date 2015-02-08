@@ -85,12 +85,22 @@
 
 /* Confirm buttons */
 
-.confirm-btn {
+.ui-btn.confirm-btn, .ui-btn.confirm-btn:focus {
 	color: #000000;
 	background-color: #0DFF00;
 }
 
+.ui-btn.confirm-btn:hover {
+    background-color: #6dff63;
+}
 
+.ui-btn.confirm-btn:active, .ui-btn.confirm-btn:hover:active {
+    background-color: #0fe200;
+}
+
+.ui-btn.confirm-btn:disabled {
+    background-color: lightgray;
+}
 
 /* Mask page */
 #mask-page {
