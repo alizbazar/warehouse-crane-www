@@ -337,3 +337,18 @@ $('#move-crane-to-target').on('click', function() {
 
 
 getNextTask();
+
+
+
+var pressTimer;
+$("#refreshApp").mouseup(function(){
+  clearTimeout(pressTimer);
+  // Clear timeout
+  return false;
+}).mousedown(function(){
+  // Set timeout
+  pressTimer = window.setTimeout(function() {
+    window.location.reload();
+  },1000)
+  return false; 
+});

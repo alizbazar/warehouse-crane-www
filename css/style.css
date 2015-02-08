@@ -227,3 +227,15 @@ button.ui-btn.btn-half {
     margin-left: -32px;
     margin-top: 12px;
 }
+
+#refreshApp {
+    width: 64px;
+    height: 64px;
+    position: absolute;
+    left: 50%;
+    top: 0;
+    margin-left: -64px;
+    background-image: url('/img/empty.gif');
+    background-repeat: repeat;
+    z-index: 100;
+}
