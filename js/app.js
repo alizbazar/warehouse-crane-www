@@ -281,14 +281,14 @@ $('.ui-page').on('click', '.ui-btn', function(e) {
         spinner.spin();
         getPositions(function(pos) {
             switchView('outgoing-map');
+        	if(!isAutoMapUpdateOn) {
+        		isAutoMapUpdateOn = true;
+        		setTimeout(autoUpdateMap, 1000);
+        	}
             updateMap(pos, item);
             spinner.stop();
         });
     } else if (context == 'outgoing-map') {
-    	if(!isAutoMapUpdateOn) {
-    		isAutoMapUpdateOn = true;
-    		setTimeout(autoUpdateMap, 1000);
-    	}
         // (change item status as to LEAVING_STORAGE) -> done with setting task status to STARTED
         spinner.spin();
         $.post(baseUrl + '/api/task/' + task._id + '/setStatus', {status: 'STARTED'}, function(data) {
