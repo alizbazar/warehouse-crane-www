@@ -1,13 +1,18 @@
-var baseUrl = 'http://192.168.1.213:5000';
-//var baseUrl = 'http://192.168.240.197:5000';
+var baseUrl = window.location.href.indexOf('localhost:') == -1 ? 'https://warehouse-crane.herokuapp.com' : 'http://localhost:5000';
+
+// Crane limits
+var HOIST_TOP = 10000;
+var HOIST_BOTTOM = 200;
+var BRIDGE_LEFT = 14000;
+var BRIDGE_RIGHT = 8000;
+var TROLLEY_NEAR = 1200;
+var TROLLEY_FAR = 7800;
 
 /*global define, console*/
 
 /**
  * App module
  */
-
-isAutoMapUpdateOn = false;
 
 define({
     name: 'app',
@@ -52,28 +57,128 @@ define({
 
 var task = null;
 var item = null;
-var newItem = null;
+var currentCraneTarget = null;
+
+var currentView = 'no-tasks';
+var home = {
+    x: 8000,
+    y: 1200,
+    z: 1000
+};
 
 var mock = {
+    noSensor: true,
     items: [
         {name: "Koskenkorva", info: "weight:1000kg; dimensions:1000x780x460"},
         {name: "Virun Valkee", info: "weight:850kg; dimensions:800x860x500"},
         {name: "Jaloviina", info: "weight:900kg; dimensions:900x800x520"}
     ],
-    simulateNewItem: function() {
-        $('.task-actions.incoming-select .ui-btn').removeAttr('disabled');
-        var r = parseInt(Math.random() * 100,10)%3;
-        newItem = mock.items[r];
-    }
+    sensor: (function() {
+        var itemNear = null;
+        var callback = null;
+
+        return {
+            sense: function(item) {
+                if (item) {
+                    itemNear = item;
+                    callback(item);
+                } else {
+                    var r = parseInt(Math.random() * 99,10)%3;
+                    itemNear = mock.items[r];
+                    callback(itemNear);
+                }
+            },
+            turnOff: function() {
+                itemNear = null;
+                callback = null;
+            },
+            searchForItems: function(cb) {
+                callback = cb;
+            },
+            getItemNearBy: function() {
+                return itemNear;
+            }
+        };
+    }()),
+
+    noCrane: true, // This determines if crane mocking functions are in use
+    crane: (function() {
+        var position = {
+            bridge: 9000,
+            trolley: 5000,
+            hoist: 2000,
+            x: 12000,
+            y: 3000,
+            z: 1200
+        };
+
+        var delta = {
+            x: BRIDGE_LEFT - BRIDGE_RIGHT,
+            y: TROLLEY_FAR - TROLLEY_NEAR,
+            z: HOIST_TOP - HOIST_BOTTOM
+        };
+
+        var moveTag = function(target) {
+            if (!mock.noCrane) {
+                return;
+            }
+            if (target === true) { // moving to loading area
+                position.x = home.x;
+                position.y = home.y;
+                position.z = home.z;
+            } else if (target) { // target is location object
+                position.x = target.bridge;
+                position.y = target.trolley;
+                position.z = target.hoist;
+            } else {
+                position.x = parseInt(Math.random() * delta.x + BRIDGE_RIGHT, 10);
+                position.y = parseInt(Math.random() * delta.y + TROLLEY_NEAR, 10);
+                position.z = parseInt(Math.random() * delta.z + HOIST_BOTTOM, 10);
+            }
+        };
+
+        return {
+            moveCraneToCenter: function() {
+                position.bridge = (BRIDGE_RIGHT + BRIDGE_LEFT)/2;
+                position.trolley = (TROLLEY_FAR + TROLLEY_NEAR)/2;
+            },
+            setCranePosition: function(bridge, hoist, trolley, callback) {
+                position.bridge = bridge;
+                position.trolley = trolley;
+                position.hoist = hoist;
+                callback();
+                alert('Crane moved to ' + bridge + ';' + hoist + ';' + trolley);
+            },
+            getPositions: function(callback) {
+                callback(position);
+            },
+            moveTag: moveTag
+        };
+    }()),
+
+    demoMode: true
 };
 
-function resetAll() {
-    switchView('no-tasks');
-    $('.task-actions.incoming-select .ui-btn').attr('disabled', 'disabled');
-    item = null;
-    task = null;
-    newItem = null;
-    getNextTask();
+// Use mock crane if no crane available
+if (mock.noCrane) {
+    setCranePosition = mock.crane.setCranePosition;
+    getPositions = mock.crane.getPositions;
+}
+
+// Use mock sensor if no sensor available
+if (mock.noSensor) {
+    sensor = mock.sensor;
+}
+
+if (mock.demoMode) {
+    $('#mockGenerateMore').toggleClass('hidden', false);
+    $('#mockGenerateMore button').click(function() {
+        spinner.spin();
+        $.post(baseUrl + '/api/generateMoreTasks', function() {
+            spinner.stop();
+            resetAll();
+        });
+    });
 }
 
 function getNextTask(callback) {
@@ -95,16 +200,20 @@ function getNextTask(callback) {
             // TODO: error handling if no task name
             switchView('no-tasks');
         }
+        if (callback) {
+            callback();
+        }
     });
 
 }
 
 // Relevant divs:
-// incoming-start incoming-select incoming-transfer incoming-more outgoing-start outgoing-map outgoing-transfer
-// .task-content, .task-actions
+// VIEWS: incoming-start incoming-select incoming-transfer incoming-more outgoing-start outgoing-map outgoing-transfer
+// AREAS: .task-content, .task-actions
 function switchView(view) {
     $('.task-content, .task-actions').not('.' + view).toggleClass('hidden', true);
     $('.task-content.' + view + ', .task-actions.' + view).toggleClass('hidden', false);
+    currentView = view;
 }
 
 function updateMap(pos, item) {
@@ -125,8 +234,6 @@ function updateMap(pos, item) {
             z: pos.hoist
         }
     };
-
-    console.log(sourceCoords);
 
     // do the conversion to 0-100
     var convert = {
@@ -154,7 +261,6 @@ function updateMap(pos, item) {
             y: convert.y(sourceCoords.crane.y)
         }
     };
-    console.log(destCoords);
 
     // TODO: update map values
     $("#item").css("left", destCoords.item.x+"%");
@@ -179,7 +285,7 @@ var spinner = (function() {
         }
         $disabledButtons = null;
         if (notification) {
-            $.post('/api/notify', {"notification": notification}, function() {
+            $.post(baseUrl + '/api/notify', {"notification": notification}, function() {
                 console.log('notified server');
             });
         }
@@ -203,46 +309,83 @@ var spinner = (function() {
     }
 }());
 
+
+function resetAll() {
+    switchView('no-tasks');
+    resetIncomingSelect();
+    item = null;
+    task = null;
+    sensor.turnOff();
+    currentCraneTarget = null;
+    spinner.spin();
+    getNextTask(function() {
+        spinner.stop();
+    });
+}
+
+
+function incomingSelect(newItem) {
+    // toggle disabled state of the button
+    $('.task-actions.incoming-select .ui-btn').removeAttr('disabled');
+    // Switch .task-content text with item name when in proximity
+    $('.task-content.incoming-select .default-message').toggleClass('hidden', true);
+    $('.task-content.incoming-select .alt-message').text(newItem.name).toggleClass('hidden', false);
+}
+function resetIncomingSelect() {
+    $('.task-actions.incoming-select .ui-btn').attr('disabled', 'disabled');
+    $('.task-content.incoming-select .default-message').toggleClass('hidden', false);
+    $('.task-content.incoming-select .alt-message').text('').toggleClass('hidden', true);
+}
+
 $('.ui-page').on('click', '.ui-btn', function(e) {
     var $btn = $(this);
     var context = $btn.closest('footer').data('context');
 
-    var autoUpdateMap = function() {
-        console.log("autoUpdateMap");
-        if (context == 'outgoing-start') {
-            console.log("AUTOUPDATING");
-            getPositions(function(pos) {
-                if (item) {
-                  updateMap(pos, item);
-                }
-            });
-        }
-        setTimeout(autoUpdateMap, 1000);
-    }
-
     if (context == 'incoming-start') {
+        if (mock.noCrane) {
+            mock.crane.moveTag(true); // Go to loading area
+        }
+        currentCraneTarget = 'LOADING_AREA';
         switchView('incoming-select');
-        newItem = null;
-        // Switch .task-content text with item name when in proximity
-        // toggle disabled state of the button
-        setTimeout(function() {
-            mock.simulateNewItem();
-        }, 1000);
+
+        sensor.searchForItems(function(newItem) {
+            if (newItem) {
+                incomingSelect(newItem);
+            } else {
+                resetIncomingSelect();
+            }
+        });
+        if (mock.noSensor) {
+            setTimeout(function() {
+                mock.sensor.sense();
+            }, 3000);
+        }
 
     } else if (context == 'incoming-select') {
-        // TODO: select item, send to server
+        // select item, send to server
+        var newItem = sensor.getItemNearBy();
         if (!newItem) {
-            console.log('error: newItem is NULL');
+            console.log('error: No items near by');
             resetAll();
             return;
         }
+
+        sensor.turnOff();
+
+        currentCraneTarget = null;
 
         spinner.spin();
         $.post(baseUrl + '/api/item/create', newItem, function(data) {
             console.log(data);
             item = data.item;
+            if (mock.noCrane) {
+                mock.crane.moveTag(); // Go to random area
+            }
             switchView('incoming-transfer');
             spinner.stop();
+            if (mock.noCrane) {
+                mock.crane.moveTag();
+            }
         });
 
     } else if (context == 'incoming-transfer') {
@@ -261,15 +404,22 @@ $('.ui-page').on('click', '.ui-btn', function(e) {
     } else if (context == 'incoming-more') {
         // identify yes / no
         if ($btn.hasClass('confirm-btn')) {
+            currentCraneTarget = 'LOADING_AREA';
+            if (mock.noCrane) {
+                mock.crane.moveTag(true); // Go back to loading area
+            }
             switchView('incoming-select');
-            newItem = null;
-            $('.task-actions.incoming-select .ui-btn').attr('disabled', 'disabled');
+            resetIncomingSelect();
 
-            // Switch .task-content text with item name when in proximity
-            // toggle disabled state of the button
-            setTimeout(function() {
-                mock.simulateNewItem();
-            }, 1000);
+            sensor.searchForItems(function(newItem) {
+                incomingSelect(newItem);
+            });
+
+            if (mock.noSensor) {
+                setTimeout(function() {
+                    mock.sensor.sense();
+                }, 1000);
+            }
         } else {
             // no => mark task complete && getNextItem
             spinner.spin();
@@ -282,28 +432,41 @@ $('.ui-page').on('click', '.ui-btn', function(e) {
             });
         }
     } else if (context == 'outgoing-start') {
-        // TODO: (set task status to STARTED)?? && get own location & crane location, draw crane, item & me on the map && display item identifier
+        // get own location & crane location, draw crane, item & me on the map && display item identifier
+        currentCraneTarget = 'ITEM';
         spinner.spin();
+
+        // If no real crane is connected, move it to middle of the screen to separate from TAG and ME
+        if (mock.noCrane) {
+            mock.crane.moveCraneToCenter();
+        }
         getPositions(function(pos) {
             switchView('outgoing-map');
-        	if(!isAutoMapUpdateOn) {
-        		isAutoMapUpdateOn = true;
-        		setTimeout(autoUpdateMap, 1000);
-        	}
             updateMap(pos, item);
+            if (mock.noCrane) {
+                // Go in a moment to item location
+                setTimeout(function() {
+                    mock.crane.moveTag(item.location);
+                }, 5000);
+            }
             spinner.stop();
         });
     } else if (context == 'outgoing-map') {
         // (change item status as to LEAVING_STORAGE) -> done with setting task status to STARTED
+        currentCraneTarget = 'LOADING_AREA';
         spinner.spin();
         $.post(baseUrl + '/api/task/' + task._id + '/setStatus', {status: 'STARTED'}, function(data) {
             console.log(data);
+            if (mock.noCrane) {
+                mock.crane.moveTag(true); // Go to loading area
+            }
             switchView('outgoing-transfer');
             spinner.stop();
         });
         // TODO: highlight when item close by
     } else if (context == 'outgoing-transfer') {
-        // TODO: remove item from storage && getNextItem
+        currentCraneTarget = null;
+        // remove item from storage && getNextItem
         spinner.spin();
         $.post(baseUrl + '/api/task/' + task._id + '/setStatus', {status: 'COMPLETED'}, function(data) {
             console.log(data);
@@ -320,35 +483,38 @@ $('#move-crane-here').on('click', function() {
     spinner.spin();
     getPositions(function(pos) {
         setCranePosition(pos.x, pos.z, pos.y, function() {
-            spinner.stop('Crane target set');
+            spinner.stop('Crane target set to TAG location');
         });
     });
 });
 
 $('#move-crane-to-target').on('click', function() {
     console.log('crane-moving-to-target');
-    if (item && item.location) {
+    if (item && item.location && currentCraneTarget == 'ITEM') {
         spinner.spin();
         setCranePosition(item.location.bridge, item.location.hoist, item.location.trolley, function() {
-            spinner.stop('Crane target set');
+            spinner.stop('Crane target set to ITEM location');
+        });
+    } else if (currentCraneTarget == 'LOADING_AREA') {
+        spinner.spin();
+        setCranePosition(home.x, home.z, home.y, function() {
+            spinner.stop('Crane target set to LOADING AREA')
         });
     }
 });
 
 
+// autoupdate map whenever in view
+(function autoUpdateMap() {
+    if (currentView == 'outgoing-map') {
+        getPositions(function(pos) {
+            if (item) {
+              updateMap(pos, item);
+            }
+        });
+    }
+    setTimeout(autoUpdateMap, 1000);
+}());
+
 getNextTask();
 
-
-
-var pressTimer;
-$("#refreshApp").mouseup(function(){
-  clearTimeout(pressTimer);
-  // Clear timeout
-  return false;
-}).mousedown(function(){
-  // Set timeout
-  pressTimer = window.setTimeout(function() {
-    window.location.reload();
-  },1000)
-  return false; 
-});

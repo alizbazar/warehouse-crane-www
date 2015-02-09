@@ -55,6 +55,11 @@
 	text-align: center;
 }
 
+/* This is to fix Tizen framework height calculation on desktop */
+.task-content {
+    min-height: 100%;
+}
+
 .ui-content {
 	text-align: center;
 }
@@ -100,6 +105,10 @@
 
 .ui-btn.confirm-btn:disabled {
     background-color: lightgray;
+}
+
+.ui-btn.cancel-btn {
+    background-color: gray;
 }
 
 /* Mask page */

@@ -1,5 +1,7 @@
 Gear app for Industry Hack
 
+Designed for 360 x 480 px screen on Samsung Gear 
+
 **Crane functions:**
 
 * setCranePosition(bridge, hoist, trolley)

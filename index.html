@@ -45,7 +45,7 @@
             <div id="map">
 	            <div id="item" class="map-elem"><div id="circle-red"></div>Item</div>
 	            <div id="crane" class="map-elem"><div id="circle-green"></div>Crane</div>
-	            <div id="tag" class="map-elem"><div id="circle-yellow"></div>Beacon</div>
+	            <div id="tag" class="map-elem"><div id="circle-yellow"></div>Me</div>
             </div>
             <div id="mapItemName"></div>
         </section>
@@ -55,7 +55,9 @@
         </section>
         
         <section class="ui-content task-content no-tasks hidden" data-context="no-tasks">
-            <div class="main-message">Congrats! There are no more tasks.</div>
+            <div class="main-message">Congrats! There are no more tasks.
+                <div id="mockGenerateMore" class="hidden"><button type="button" class="ui-btn">Generate more</button></div>
+            </div>
         </section>
 
         <footer class="ui-footer task-actions incoming-start hidden" data-context="incoming-start">
@@ -90,35 +92,11 @@
         
     </div>
 
-    <div class="ui-page" id="move-crane-page">
-        <header>
-        </header>
-        
-        <section>
-        </section>
-        
-      <footer>
-        </footer>
-    </div>
-
-    <div class="ui-page" id="no-tasks-page">
-    </div>
     <div id="spinner" class="hidden"></div>
     <div id="refreshApp"></div>
 
     <script src="./lib/tau/wearable/js/tau.js"></script>
     <script src="./js/core/core.js" data-main="./js/app.js"></script>
-
-          <script>
-  console.log("OERR 1");
-  	getCranePosition(myCallback);
-  console.log("OERR 2");
-  	
-  	function myCallback(response) {
-  		console.log("CALLBACK CALLED");
-  		console.log(response);
-  	}
-  </script>
 
 
 </body>
